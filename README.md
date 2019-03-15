@@ -1,6 +1,7 @@
 # AerogearTasks
 
-Created an empty placeholder library :- **aerogearandroidlibrary**.  
+Created an empty placeholder library :- **library**.  
+
 Created a sample task app which takes the task title and description.  
 
 **Screenshot of the current app**   
