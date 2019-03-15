@@ -10,8 +10,10 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        // Required plugins added to classpath to facilitate pushing to Jcenter/Bintray
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+
     }
 }
 
@@ -24,4 +26,18 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+
+
+    // Aerogear Library Info
+    libVersionCode = 1
+    libVersionName = '1.0.0'
+    libPomUrl = 'https://github.com/Lavanyagaur22/AerogearTasks'
+    libGithubRepo = 'Lavanyagaur22/AerogearTasks'
+    libModuleName = 'aerogearandroidlibrary'
+    libModuleDesc = 'Android library for Aerogear conflict resolution'
+    libBintrayName = 'aerogearandroidlibrary'
+
 }
