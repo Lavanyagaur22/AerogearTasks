@@ -1,1 +1,1 @@
-include ':app', ':aerogearandroidlibrary'
+include ':sample-app', ':library'
