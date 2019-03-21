@@ -8,6 +8,7 @@ class MyApolloClient {
 
     companion object {
 
+        //BASE_URL is of the format http://your_ip_adress:4000/graphql
         private val BASE_URL = "http://192.168.0.105:4000/graphql"
 
         private var myApolloClient: ApolloClient? = null
