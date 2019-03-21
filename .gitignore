@@ -1,4 +1,5 @@
 *.iml
+/build
 .gradle
 /local.properties
 .idea
@@ -10,8 +11,9 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
 /captures
 .externalNativeBuild
-.gradle
-.idea
+bin/
+gen/
+out/
+
