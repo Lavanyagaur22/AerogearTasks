@@ -21,7 +21,7 @@ class MyApolloClient : Application() {
     companion object {
 
         //BASE_URL is of the format http://your_ip_adress:4000/graphql
-        private val BASE_URL = "http://192.168.43.243:4000/graphql"
+        private val BASE_URL = "http://192.168.0.106:4000/graphql"
         private var myApolloClient: ApolloClient? = null
         private val SQL_CACHE_NAME = "tasksdb"
 
@@ -49,27 +49,23 @@ class MyApolloClient : Application() {
 
             override fun fromFieldRecordSet(field: Field, recordSet: MutableMap<String, Any>): CacheKey {
 
-                Log.e("Application", "fromFieldRecordSet ${formatCacheKey(recordSet["id"] as String)}")
-                return formatCacheKey(recordSet["id"] as String)
-
+                Log.e("Application", "fromFieldRecordSet ${(recordSet["id"] as String)}")
+                if (recordSet.containsKey("id")) {
+                    val typeNameAndIDKey = recordSet["__typename"].toString() + "." + recordSet["id"]
+                    return CacheKey.from(typeNameAndIDKey)
+                }
+                return CacheKey.NO_KEY
             }
 
             // Use this resolver to customize the key for fields with variables: eg entry(repoFullName: $repoFullName).
             // This is useful if you want to make query to be able to resolved, even if it has never been run before.
             override fun fromFieldArguments(field: Field, variables: Operation.Variables): CacheKey {
 
-                Log.e("Application", "fromFieldArguments ${formatCacheKey(variables.toString())}")
+                Log.e("Application", "fromFieldArguments $variables")
 
                 return CacheKey.NO_KEY
             }
 
-            private fun formatCacheKey(id: String?): CacheKey {
-                return if (id == null || id.isEmpty()) {
-                    CacheKey.NO_KEY
-                } else {
-                    CacheKey.from(id)
-                }
-            }
         }
 
         //Build the apollo client
