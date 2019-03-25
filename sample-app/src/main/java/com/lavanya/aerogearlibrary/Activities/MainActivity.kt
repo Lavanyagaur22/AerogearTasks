@@ -9,16 +9,14 @@ import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
 import com.lavanya.aerogearlibrary.Adapter.TaskAdapter
 import com.lavanya.aerogearlibrary.AllTasksQuery
-import com.lavanya.aerogearlibrary.MyApolloClient
 import com.lavanya.aerogearlibrary.Model.Task
+import com.lavanya.aerogearlibrary.MyApolloClient
 import com.lavanya.aerogearlibrary.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     val noteslist = arrayListOf<Task>()
-    var title = ""
-    var desc = ""
     val TAG = javaClass.simpleName
     val taskAdapter by lazy {
         TaskAdapter(noteslist)
@@ -65,7 +63,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun getTasks() {
 
-        val client=MyApolloClient.getMyApolloClient()?.query(
+//        val client=MyApolloClient.getMyApolloClient()?.query(
+//            AllTasksQuery.builder().build()
+//        )
+
+        val client = MyApolloClient.getMyApolloClient()?.query(
             AllTasksQuery.builder().build()
         )
 
@@ -73,21 +75,21 @@ class MainActivity : AppCompatActivity() {
 
             override fun onFailure(e: ApolloException) {
 
-                Log.e(TAG, " ${e.message}")
+                Log.e(TAG, e.toString())
 
             }
+
             override fun onResponse(response: Response<AllTasksQuery.Data>) {
 
                 val result = response.data()?.allTasks()
                 Log.e(TAG, "onResponse: ${result?.get(2)?.title()}")
 
-                result?.let {
-                    for (r in it) {
-                        title = r.title()
-                        desc = r.description()
-                        val task = Task(title, desc)
-                        noteslist.add(task)
-                    }
+                result?.forEach {
+                    val title = it.title()
+                    val desc = it.description()
+                    val id = it.id()
+                    val task = Task(title, desc, id.toInt())
+                    noteslist.add(task)
                 }
                 runOnUiThread {
                     taskAdapter.notifyDataSetChanged()
