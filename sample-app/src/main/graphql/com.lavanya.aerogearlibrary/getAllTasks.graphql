@@ -3,5 +3,6 @@ query allTasksQuery{
     id
     title
     description
+    version
   }
 }

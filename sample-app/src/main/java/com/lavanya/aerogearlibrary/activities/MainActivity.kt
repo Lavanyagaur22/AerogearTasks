@@ -1,4 +1,4 @@
-package com.lavanya.aerogearlibrary.Activities
+package com.lavanya.aerogearlibrary.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -7,19 +7,18 @@ import android.util.Log
 import com.apollographql.apollo.ApolloCall
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
-import com.lavanya.aerogearlibrary.Adapter.TaskAdapter
-import com.lavanya.aerogearlibrary.AllTasksQuery
-import com.lavanya.aerogearlibrary.Model.Task
-import com.lavanya.aerogearlibrary.MyApolloClient
-import com.lavanya.aerogearlibrary.R
+import com.lavanya.aerogearlibrary.*
+import com.lavanya.aerogearlibrary.adapter.TaskAdapter
+import com.lavanya.aerogearlibrary.model.Task
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+
     val noteslist = arrayListOf<Task>()
     val TAG = javaClass.simpleName
     val taskAdapter by lazy {
-        TaskAdapter(noteslist)
+        TaskAdapter(noteslist, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,40 +60,84 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getTasks() {
+    fun getTasks() {
 
-//        val client=MyApolloClient.getMyApolloClient()?.query(
-//            AllTasksQuery.builder().build()
-//        )
+        Log.e(TAG, "inside getTasks")
 
-        val client = MyApolloClient.getMyApolloClient()?.query(
+        val client = Utils.getApolloClient(this)?.query(
             AllTasksQuery.builder().build()
         )
 
         client?.enqueue(object : ApolloCall.Callback<AllTasksQuery.Data>() {
 
             override fun onFailure(e: ApolloException) {
-
+                e.printStackTrace()
                 Log.e(TAG, e.toString())
-
             }
 
             override fun onResponse(response: Response<AllTasksQuery.Data>) {
 
                 val result = response.data()?.allTasks()
-                Log.e(TAG, "onResponse: ${result?.get(2)?.title()}")
+                Log.e(TAG, "onResponse: ${result?.get(1)?.title()} ${result?.get(1)?.version()}")
 
                 result?.forEach {
                     val title = it.title()
                     val desc = it.description()
                     val id = it.id()
-                    val task = Task(title, desc, id.toInt())
+                    val version: Int? = it.version()
+                    val task = Task(title, desc, id.toInt(), version!!)
                     noteslist.add(task)
                 }
                 runOnUiThread {
                     taskAdapter.notifyDataSetChanged()
                 }
+            }
+        })
+    }
 
+    fun updateTask(id: String, title: String, version: Int) {
+
+        Log.e(TAG, "inside update task")
+
+        val client = Utils.getApolloClient(this)?.mutate(
+            UpdateCurrentTask.builder().id(id).title(title).version(version).build()
+        )
+        client?.enqueue(object : ApolloCall.Callback<UpdateCurrentTask.Data>() {
+            override fun onFailure(e: ApolloException) {
+                Log.e("onFailure" + "updateTask", e.toString())
+            }
+
+            override fun onResponse(response: Response<UpdateCurrentTask.Data>) {
+                val result = response.data()?.updateTask()
+                Log.e(TAG, "${result?.id()}")
+                Log.e(TAG, "${result?.title()}")
+                Log.e(TAG, "${result?.description()}")
+                Log.e(TAG, "${result?.version()}")
+            }
+        })
+        noteslist.clear()
+        getTasks()
+    }
+
+    private fun createtask(title: String, description: String) {
+
+        Log.e(TAG, "inside create task")
+
+        val client = Utils.getApolloClient(this)?.mutate(
+            CreateTask.builder().title(title).description(description).build()
+        )
+
+        client?.enqueue(object : ApolloCall.Callback<CreateTask.Data>() {
+            override fun onFailure(e: ApolloException) {
+                Log.e("onFailure" + "createTask", e.toString())
+            }
+
+            override fun onResponse(response: Response<CreateTask.Data>) {
+                val result = response.data()?.createTask()
+                Log.e(TAG, "${result?.id()}")
+                Log.e(TAG, "${result?.title()}")
+                Log.e(TAG, "${result?.description()}")
+                Log.e(TAG, "${result?.version()}")
             }
         })
     }
